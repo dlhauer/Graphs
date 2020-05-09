@@ -18,11 +18,18 @@ class Graph:
         return self.vertices[vertex_id]
 
     def bft(self, starting_vertex):
-        """
-        Print each vertex in breadth-first order
-        beginning from starting_vertex.
-        """
-        pass  # TODO
+        visited = {starting_vertex}
+        queue = Queue()
+        queue.enqueue(starting_vertex)
+
+        while queue.size() > 0:
+            u = queue.dequeue()
+            print(u)
+            for v in self.get_neighbors(u):
+                if v not in visited:
+                    queue.enqueue(v)
+                    visited.add(v)
+                
 
     def dft(self, starting_vertex):
         """
