@@ -30,13 +30,18 @@ class Graph:
                     queue.enqueue(v)
                     visited.add(v)
                 
-
     def dft(self, starting_vertex):
-        """
-        Print each vertex in depth-first order
-        beginning from starting_vertex.
-        """
-        pass  # TODO
+        visited = {starting_vertex}
+        stack = Stack()
+        stack.push(starting_vertex)
+
+        while stack.size() > 0:
+            u = stack.pop()
+            print(u)
+            for v in self.get_neighbors(u):
+                if v not in visited:
+                    stack.push(v)
+                    visited.add(v)
 
     def dft_recursive(self, starting_vertex):
         """
