@@ -52,17 +52,32 @@ class Graph:
                 if v not in visited:
                     visited.add(v)
                     dft_print(v)
-            
 
         dft_print(starting_vertex)
 
     def bfs(self, starting_vertex, destination_vertex):
-        """
-        Return a list containing the shortest path from
-        starting_vertex to destination_vertex in
-        breath-first order.
-        """
-        pass  # TODO
+        parent_map = {starting_vertex: None}
+        visited = {starting_vertex}
+        queue = Queue()
+        queue.enqueue(starting_vertex)
+
+        while queue.size() > 0:
+            u = queue.dequeue()
+            if u == destination_vertex:
+                break
+            for v in self.get_neighbors(u):
+                if v not in visited:
+                    parent_map[v] = u
+                    queue.enqueue(v)
+                    visited.add(v)
+            
+        path = [destination_vertex]
+        parent = parent_map[destination_vertex]
+        while parent:
+            path.insert(0, parent)
+            parent = parent_map[parent]
+        return path
+                 
 
     def dfs(self, starting_vertex, destination_vertex):
         """
