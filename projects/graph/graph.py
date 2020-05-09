@@ -15,10 +15,7 @@ class Graph:
         self.vertices[v1].add(v2)
 
     def get_neighbors(self, vertex_id):
-        """
-        Get all neighbors (edges) of a vertex.
-        """
-        pass  # TODO
+        return self.vertices[vertex_id]
 
     def bft(self, starting_vertex):
         """
