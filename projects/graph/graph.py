@@ -71,21 +71,34 @@ class Graph:
                     queue.enqueue(v)
                     visited.add(v)
             
+        return self.get_path(destination_vertex, parent_map)
+
+    def dfs(self, starting_vertex, destination_vertex):
+        parent_map = {starting_vertex: None}
+        visited = {starting_vertex}
+        stack = Stack()
+        stack.push(starting_vertex)
+
+        while stack.size() > 0:
+            u = stack.pop()
+            if u == destination_vertex:
+                break
+            for v in self.get_neighbors(u):
+                if v not in visited:
+                    parent_map[v] = u
+                    stack.push(v)
+                    visited.add(v)
+        
+        return self.get_path(destination_vertex, parent_map)
+        
+        
+    def get_path(self, destination_vertex, parent_map):
         path = [destination_vertex]
         parent = parent_map[destination_vertex]
         while parent:
             path.insert(0, parent)
             parent = parent_map[parent]
         return path
-                 
-
-    def dfs(self, starting_vertex, destination_vertex):
-        """
-        Return a list containing a path from
-        starting_vertex to destination_vertex in
-        depth-first order.
-        """
-        pass  # TODO
 
     def dfs_recursive(self, starting_vertex, destination_vertex):
         """
