@@ -1,4 +1,5 @@
 import random
+from util import Queue
 
 class User:
     def __init__(self, name):
@@ -30,6 +31,9 @@ class SocialGraph:
         self.users[self.last_id] = User(name)
         self.friendships[self.last_id] = set()
 
+    def get_friends(self, user_id):
+        return self.friendships[user_id]
+
     def populate_graph(self, num_users, avg_friendships):
         
         self.last_id = 0
@@ -47,25 +51,28 @@ class SocialGraph:
                 self.add_friendship(user_id, friend_id)
                 friendship_count += 2
 
-        # Create friendships
-
     def get_all_social_paths(self, user_id):
-        """
-        Takes a user's user_id as an argument
+        visited = {user_id: [user_id]}  
+        queue = Queue()
+        queue.enqueue(user_id)
 
-        Returns a dictionary containing every user in that user's
-        extended network with the shortest friendship path between them.
+        while queue.size() > 0:
+            u = queue.dequeue()
+            for v in self.get_friends(u):
+                if v not in visited:
+                    visited[v] = visited[u] + [v]
+                    queue.enqueue(v)
 
-        The key is the friend's ID and the value is the path.
-        """
-        visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
         return visited
 
 
 if __name__ == '__main__':
     sg = SocialGraph()
     sg.populate_graph(10, 2)
+    print('\n')
     print(sg.friendships)
-    # connections = sg.get_all_social_paths(1)
-    # print(connections)
+    print('\n')
+    connections = sg.get_all_social_paths(1)
+    print(connections)
+    print('\n')
+
