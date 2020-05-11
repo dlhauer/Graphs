@@ -65,14 +65,24 @@ class SocialGraph:
 
         return visited
 
+    def get_avg_deg_sep(self, user_id):
+        total = 0
+        connections = self.get_all_social_paths(user_id).values()
+        for path in connections:
+            total += len(path)
+        return total / len(connections)
+
 
 if __name__ == '__main__':
     sg = SocialGraph()
-    sg.populate_graph(10, 2)
+    num_users = 10
+    sg.populate_graph(num_users, 2)
     print('\n')
     print(sg.friendships)
     print('\n')
     connections = sg.get_all_social_paths(1)
     print(connections)
+    # print(len(connections.keys()) / num_users)
+    # print(sg.get_avg_deg_sep(1))
     print('\n')
 
