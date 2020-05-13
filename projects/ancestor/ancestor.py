@@ -19,10 +19,6 @@ def earliest_ancestor(ancestors, starting_node):
         if len(parents) > 0:
             generations.append(parents)
 
-    for row in generations:
-        print(row)
-    print('\n')
-
     return min(generations[-1])
 
         
