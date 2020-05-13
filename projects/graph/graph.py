@@ -118,6 +118,23 @@ class Graph:
         search(starting_vertex, destination_vertex)
         return path
 
+    def dfs_recursive_two(self, starting_vertex, destination_vertex):
+            visited = {starting_vertex}
+            path = [starting_vertex]
+
+            def search(path, destination_vertex):
+                if path[-1] == destination_vertex:
+                    # path.insert(0, starting_vertex)
+                    return path
+                for v in self.get_neighbors(path[-1]):
+                    if v not in visited:
+                        visited.add(v)
+                        path_copy = path.copy()
+                        path_copy.append(v)
+                        return search(path_copy, destination_vertex)
+            
+            return search(path, destination_vertex)
+
 if __name__ == '__main__':
     graph = Graph()  # Instantiate your graph
     # https://github.com/LambdaSchool/Graphs/blob/master/objectives/breadth-first-search/img/bfs-visit-order.png
@@ -184,4 +201,5 @@ if __name__ == '__main__':
         [1, 2, 4, 7, 6]
     '''
     # print(graph.dfs(1, 6))
-    print(graph.dfs_recursive(1, 6))
+    # print(graph.dfs_recursive(1, 6))
+    print(graph.dfs_recursive_two(1, 6))
