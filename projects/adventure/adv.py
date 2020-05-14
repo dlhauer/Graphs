@@ -14,9 +14,9 @@ world = World()
 # You may uncomment the smaller graphs for development and testing purposes.
 # map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
-map_file = "maps/test_loop.txt"
+# map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -33,28 +33,31 @@ player = Player(world.starting_room)
 traversal_path = []
 visited = dict()
 
-visited_rooms = []
-
 def add_visited(room_id, direction=None, next_room_id=None):
+
     if room_id not in visited:
         visited[room_id] = {e: None for e in player.current_room.get_exits()}
     if direction is not None and next_room_id is not None:
         visited[room_id][direction] = next_room_id
     
-def find_dead_end(player):
+def find_dead_end():
+
     reverse = {
         'n': 's',
         's': 'n',
         'e': 'w',
         'w': 'e'
     }
+
     while True:
-        prev_room_id = player.current_room.id
-        add_visited(prev_room_id)
-        visited_rooms.append(prev_room_id)
-        exits = [e for e in player.current_room.get_exits() if visited[prev_room_id][e] is None]
+        cur_room_id = player.current_room.id
+        add_visited(cur_room_id)
+        exits = [e for e in player.current_room.get_exits() if visited[cur_room_id][e] is None]
+
         if len(exits) == 0:
             break
+
+        prev_room_id = cur_room_id
         direction = random.choice(exits)
         player.travel(direction)
         traversal_path.append(direction)
@@ -62,15 +65,40 @@ def find_dead_end(player):
         add_visited(prev_room_id, direction, cur_room_id)
         add_visited(cur_room_id, reverse[direction], prev_room_id)
 
-def traverse_map():
-    find_dead_end(player)
+def find_new_path():
 
+    queue = Queue()
+    cur_room_id = player.current_room.id
+    breadth_visited = {cur_room_id}
+    for direction, room in visited[cur_room_id].items():
+        queue.enqueue([(room, direction)])
+
+    while queue.size() > 0:
+        cur_path = queue.dequeue()
+        next_room = cur_path[-1][0]
+
+        if None in visited[next_room].values():
+            for room, direction in cur_path:
+                traversal_path.append(direction)
+                player.travel(direction)
+            break
+        
+        for direction, room in visited[next_room].items():
+            path_copy = cur_path.copy()
+            if room not in breadth_visited:
+                breadth_visited.add(room)
+                path_copy.append((room, direction))
+                queue.enqueue(path_copy)
+
+        breadth_visited.add(next_room)
+
+def traverse_map():
+    while len(visited) < len(room_graph):
+        find_dead_end()
+        find_new_path()
+
+random.seed(345047)
 traverse_map()
-print('\n')
-print(visited_rooms)
-print('\n')
-print(visited)
-print('\n')
 
 # TRAVERSAL TEST
 visited_rooms = set()
