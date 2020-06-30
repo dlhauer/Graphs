@@ -2,8 +2,10 @@ from room import Room
 from player import Player
 from world import World
 
-import random
 from ast import literal_eval
+import random
+
+from util import Stack, Queue
 
 # Load world
 world = World()
@@ -27,9 +29,76 @@ player = Player(world.starting_room)
 
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
+
 traversal_path = []
+visited = dict()
 
+def add_visited(room_id, direction=None, next_room_id=None):
 
+    if room_id not in visited:
+        visited[room_id] = {e: None for e in player.current_room.get_exits()}
+    if direction is not None and next_room_id is not None:
+        visited[room_id][direction] = next_room_id
+    
+def find_dead_end():
+
+    reverse = {
+        'n': 's',
+        's': 'n',
+        'e': 'w',
+        'w': 'e'
+    }
+
+    while True:
+        cur_room_id = player.current_room.id
+        add_visited(cur_room_id)
+        exits = [e for e in player.current_room.get_exits() if visited[cur_room_id][e] is None]
+
+        if len(exits) == 0:
+            break
+
+        prev_room_id = cur_room_id
+        direction = random.choice(exits)
+        player.travel(direction)
+        traversal_path.append(direction)
+        cur_room_id = player.current_room.id
+        add_visited(prev_room_id, direction, cur_room_id)
+        add_visited(cur_room_id, reverse[direction], prev_room_id)
+
+def find_new_path():
+
+    queue = Queue()
+    cur_room_id = player.current_room.id
+    breadth_visited = {cur_room_id}
+    for direction, room in visited[cur_room_id].items():
+        queue.enqueue([(room, direction)])
+
+    while queue.size() > 0:
+        cur_path = queue.dequeue()
+        next_room = cur_path[-1][0]
+
+        if None in visited[next_room].values():
+            for room, direction in cur_path:
+                traversal_path.append(direction)
+                player.travel(direction)
+            break
+        
+        for direction, room in visited[next_room].items():
+            path_copy = cur_path.copy()
+            if room not in breadth_visited:
+                breadth_visited.add(room)
+                path_copy.append((room, direction))
+                queue.enqueue(path_copy)
+
+        breadth_visited.add(next_room)
+
+def traverse_map():
+    while len(visited) < len(room_graph):
+        find_dead_end()
+        find_new_path()
+
+random.seed(345047)
+traverse_map()
 
 # TRAVERSAL TEST
 visited_rooms = set()
@@ -44,19 +113,18 @@ if len(visited_rooms) == len(room_graph):
     print(f"TESTS PASSED: {len(traversal_path)} moves, {len(visited_rooms)} rooms visited")
 else:
     print("TESTS FAILED: INCOMPLETE TRAVERSAL")
+    print(len(traversal_path))
     print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
-
-
 
 #######
 # UNCOMMENT TO WALK AROUND
 #######
-player.current_room.print_room_description(player)
-while True:
-    cmds = input("-> ").lower().split(" ")
-    if cmds[0] in ["n", "s", "e", "w"]:
-        player.travel(cmds[0], True)
-    elif cmds[0] == "q":
-        break
-    else:
-        print("I did not understand that command.")
+# player.current_room.print_room_description(player)
+# while True:
+#     cmds = input("-> ").lower().split(" ")
+#     if cmds[0] in ["n", "s", "e", "w"]:
+#         player.travel(cmds[0], True)
+#     elif cmds[0] == "q":
+#         break
+#     else:
+#         print("I did not understand that command.")
